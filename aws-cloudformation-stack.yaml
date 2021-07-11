@@ -1,0 +1,341 @@
+# References:
+# Policy elements reference: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html
+# Policy language grammar: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_grammar.html
+# CFN template snippets: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/CHAP_TemplateQuickRef.html
+# IAM template snippets: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-iam.html
+
+Resources:
+
+  # This IAM User can only have programmatic access. Credentials can be generated in AWS console.
+  # This user can invoke the lambda function only using temporary credentials, by assuming its execution role.
+  stsUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Sub '${AWS::StackName}-stsUser'
+
+  s3Cmk:
+    Type: AWS::KMS::Key
+    Properties:
+      Enabled: true
+      PendingWindowInDays: 7
+      KeyPolicy:
+        Id: key-consolepolicy-3
+        Version: '2012-10-17'
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+          Action: 'kms:*'
+          Resource: '*'
+        - Sid: Allow access for Key Administrators
+          Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:user/cloud_user'
+          Action:
+          - 'kms:Create*'
+          - 'kms:Describe*'
+          - 'kms:Enable*'
+          - 'kms:List*'
+          - 'kms:Put*'
+          - 'kms:Update*'
+          - 'kms:Revoke*'
+          - 'kms:Disable*'
+          - 'kms:Get*'
+          - 'kms:Delete*'
+          - 'kms:TagResource'
+          - 'kms:UntagResource'
+          - 'kms:ScheduleKeyDeletion'
+          - 'kms:CancelKeyDeletion'
+          Resource: '*'
+        - Sid: Allow use of the key
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt execGetUserRole.Arn
+            - !GetAtt execPutUserRole.Arn
+          Action:
+          - 'kms:Encrypt'
+          - 'kms:Decrypt'
+          - 'kms:ReEncrypt*'
+          - 'kms:GenerateDataKey*'
+          - 'kms:DescribeKey'
+          Resource: '*'
+        - Sid: Allow attachment of persistent resources
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt execGetUserRole.Arn
+            - !GetAtt execPutUserRole.Arn
+          Action:
+          - 'kms:CreateGrant'
+          - 'kms:ListGrants'
+          - 'kms:RevokeGrant'
+          Resource: '*'
+          Condition:
+            Bool:
+              'kms:GrantIsForAWSResource': 'true'
+
+  s3CmkAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${AWS::StackName}-cmk-s3'
+      TargetKeyId: !GetAtt s3Cmk.KeyId
+
+  usersBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::AccountId}-users-collection'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref s3Cmk
+            BucketKeyEnabled: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+
+  ssmParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '${AWS::StackName}-parameters'
+      Type: String
+      Value: !Sub
+        - '{"users-s3bucket":"${bucketName}"}'
+        - { bucketName: !Ref usersBucket }
+
+  getUserLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-getUser'
+      Role: !GetAtt execGetUserRole.Arn
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require("aws-sdk");
+
+          const SSM = new AWS.SSM();
+          const S3 = new AWS.S3();
+
+          const envParamStore = process.env.PARAM_STORE ? process.env.PARAM_STORE : "apigeeDemo-parameters";
+          const envUserBucketParam = process.env.PARAM_USER_BUCKET ? process.env.PARAM_USER_BUCKET : "users-s3bucket";
+
+          exports.handler = async(event) => {
+              console.log(`xCorrelationId: ${event.xCorrelationId}`);
+
+              try {
+                  const ssmParameter = { Name: envParamStore };
+                  const parameter = await SSM.getParameter(ssmParameter).promise();
+                  const usersBucket = JSON.parse(parameter.Parameter.Value)[envUserBucketParam];
+
+                  const userS3Object = {
+                      Bucket: usersBucket,
+                      Key: event.name
+                  };
+                  const userObject = await S3.getObject(userS3Object).promise();
+
+                  return {
+                      statusCode: 200,
+                      body: userObject.Body.toString()
+                  };
+              }
+              catch (err) {
+                  console.log(JSON.stringify(err));
+                  return {
+                      statusCode: 500,
+                      body: `Error retrieving user: "${event.name}"`
+                  };
+              }
+          };
+      Environment:
+        Variables:
+          PARAM_STORE: !Ref ssmParameter
+          PARAM_USER_BUCKET: users-s3bucket
+
+  putUserLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-putUser'
+      Role: !GetAtt execPutUserRole.Arn
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const AWS = require("aws-sdk");
+
+          const SSM = new AWS.SSM();
+          const S3 = new AWS.S3();
+
+          const envParamStore = process.env.PARAM_STORE ? process.env.PARAM_STORE : "apigeeDemo-parameters";
+          const envUserBucketParam = process.env.PARAM_USER_BUCKET ? process.env.PARAM_USER_BUCKET : "users-s3bucket";
+
+          exports.handler = async(event) => {
+              console.log(`xCorrelationId: ${event.xCorrelationId}`);
+
+              try {
+                  const ssmParameter = { Name: envParamStore };
+                  const parameter = await SSM.getParameter(ssmParameter).promise();
+                  const usersBucket = JSON.parse(parameter.Parameter.Value)[envUserBucketParam];
+
+                  const userS3object = {
+                      Bucket: usersBucket,
+                      Key: event.name,
+                      Body: JSON.stringify(event),
+                      ContentType: "text/plain",
+                  };
+
+                  await S3.putObject(userS3object).promise();
+                  return {
+                      statusCode: 200,
+                      body: `User "${event.name}" creation successful`
+                  };
+              }
+              catch (err) {
+                  console.log(JSON.stringify(err));
+                  return {
+                      statusCode: 500,
+                      body: `User "${event.name}" creation failed`
+                  };
+              }
+          };
+      Environment:
+        Variables:
+          PARAM_STORE: !Ref ssmParameter
+          PARAM_USER_BUCKET: users-s3bucket
+
+  execGetUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-execGetUserRole'
+      # Trust-relationship should include AWS services & IAM users expected to invoke the lambda function
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+            AWS: !GetAtt stsUser.Arn
+      # AWS service roles simplify permissions management
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+
+  execPutUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-execPutUserRole'
+      # Trust-relationship should include AWS services & IAM users expected to invoke the lambda function
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+            AWS: !GetAtt stsUser.Arn
+      # AWS service roles simplify permissions management
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  # Function resource refers to the Role resource as its execution role.
+  # So following as an inline-policy in Role resource would lead to circular reference error.
+  # This managed-policy is required for IAM users to invoke the lambda function.
+  # If only AWS services invoke the lambda function, AWS service roles (ManagedPolicyArns) will suffice.
+  allowInvokeGetUser:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${AWS::StackName}-allowInvokeGetUser'
+      Roles:
+      - !Ref execGetUserRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - lambda:InvokeFunction
+          Resource:
+          - !GetAtt getUserLambda.Arn
+
+  allowInvokePutUser:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${AWS::StackName}-allowInvokePutUser'
+      Roles:
+      -  !Ref execPutUserRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - lambda:InvokeFunction
+          Resource:
+          - !GetAtt putUserLambda.Arn
+
+  # Role resource refers to the User resource in its trust-relationship policy.
+  # So following as an inline-policy in User resource would lead to circular reference error.
+  allowStsUserAssumeExecRoles:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${AWS::StackName}-allowStsUserAssumeExecRoles'
+      Users:
+      - !Ref stsUser
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sts:AssumeRole
+          Resource:
+          - !GetAtt execGetUserRole.Arn
+          - !GetAtt execPutUserRole.Arn
+
+  allowGetSsmParametes:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${AWS::StackName}-allowReadSsmParametes'
+      Roles:
+      - !Ref execGetUserRole
+      - !Ref execPutUserRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - ssm:GetParameter
+          Resource:
+          - !Sub
+            - 'arn:aws:ssm:us-east-1:${AWS::AccountId}:parameter/${ssmParameter}'
+            - { ssmParameter: !Ref ssmParameter }
+
+Outputs:
+
+  apigeeUser:
+    Value: !Ref stsUser
+    Export:
+      Name: apigeeUser
+
+  getUserLambda:
+    Value: !Ref getUserLambda
+    Export:
+      Name: getUserLambda
+  
+  execGetUserRoleArn:
+    Value: !GetAtt execGetUserRole.Arn
+    Export:
+      Name: getUserExecRoleArn
+
+  putUserLambda:
+    Value: !Ref putUserLambda
+    Export:
+      Name: putUserLambda
+  
+  execPutUserRoleArn:
+    Value: !GetAtt execPutUserRole.Arn
+    Export:
+      Name: putUserExecRoleArn
