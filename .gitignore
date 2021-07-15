@@ -1,6 +1,10 @@
 # AWS access keys
+apigeeDemo-stsUser_accessKeys.csv
 *access*.csv
 
 # Logs
 logs
 *.log
+
+# Apigee trace files
+trace-*.xml

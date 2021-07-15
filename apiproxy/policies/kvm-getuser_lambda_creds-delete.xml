@@ -1,0 +1,9 @@
+<KeyValueMapOperations name="kvm-getuser_lambda_creds-delete" mapIdentifier="getuser_lambda_creds">
+	<DisplayName>Delete getUser credentials from KVM</DisplayName>
+	<Scope>apiproxy</Scope>
+	<Delete>
+		<Key>
+			<Parameter>expiration</Parameter>
+		</Key>
+	</Delete>
+</KeyValueMapOperations>

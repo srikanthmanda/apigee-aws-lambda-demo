@@ -125,7 +125,7 @@ Resources:
           const envUserBucketParam = process.env.PARAM_USER_BUCKET ? process.env.PARAM_USER_BUCKET : "users-s3bucket";
 
           exports.handler = async(event) => {
-              console.log(`xCorrelationId: ${event.xCorrelationId}`);
+              console.log(`xCorrelationId: ${event.metadata.xCorrelationId}`);
 
               try {
                   const ssmParameter = { Name: envParamStore };
@@ -134,20 +134,20 @@ Resources:
 
                   const userS3Object = {
                       Bucket: usersBucket,
-                      Key: event.name
+                      Key: event.data.username
                   };
                   const userObject = await S3.getObject(userS3Object).promise();
 
                   return {
                       statusCode: 200,
-                      body: userObject.Body.toString()
+                      body: JSON.parse(userObject.Body.toString())
                   };
               }
               catch (err) {
                   console.log(JSON.stringify(err));
                   return {
                       statusCode: 500,
-                      body: `Error retrieving user: "${event.name}"`
+                      body: `Error retrieving user: "${event.data.username}"`
                   };
               }
           };
@@ -174,7 +174,7 @@ Resources:
           const envUserBucketParam = process.env.PARAM_USER_BUCKET ? process.env.PARAM_USER_BUCKET : "users-s3bucket";
 
           exports.handler = async(event) => {
-              console.log(`xCorrelationId: ${event.xCorrelationId}`);
+              console.log(`xCorrelationId: ${event.metadata.xCorrelationId}`);
 
               try {
                   const ssmParameter = { Name: envParamStore };
@@ -183,22 +183,22 @@ Resources:
 
                   const userS3object = {
                       Bucket: usersBucket,
-                      Key: event.name,
-                      Body: JSON.stringify(event),
-                      ContentType: "text/plain",
+                      Key: event.data.username,
+                      Body: JSON.stringify(event.data),
+                      ContentType: "application/json",
                   };
 
                   await S3.putObject(userS3object).promise();
                   return {
                       statusCode: 200,
-                      body: `User "${event.name}" creation successful`
+                      body: `User "${event.data.username}" creation successful`
                   };
               }
               catch (err) {
                   console.log(JSON.stringify(err));
                   return {
                       statusCode: 500,
-                      body: `User "${event.name}" creation failed`
+                      body: `User "${event.data.username}" creation failed`
                   };
               }
           };

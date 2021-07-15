@@ -1,0 +1,14 @@
+<ExtractVariables name="ev-req-putuser">
+	<DisplayName>Extract data from PUT request</DisplayName>
+	<Source clearPayload="false">request</Source>
+	<Header name="X-Correlation-Id">
+		<Pattern>{xCorrelationId}</Pattern>
+	</Header>
+	<JSONPayload>
+		<Variable name="username" type="string">
+			<JSONPath>$.username</JSONPath>
+		</Variable>
+	</JSONPayload>
+	<VariablePrefix>ev</VariablePrefix>
+	<IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</ExtractVariables>

@@ -1,0 +1,5 @@
+<Javascript name="js-call-lambda" timeLimit="2000">
+	<DisplayName>Call Lambda function</DisplayName>
+	<IncludeURL>jsc://aws-sdk-light-apigee.bundle.js</IncludeURL>
+	<ResourceURL>jsc://call-lambda.js</ResourceURL>
+</Javascript>

@@ -18,8 +18,8 @@ aws cloudformation create-stack `
 ```
 
 Notes:
-+ The `` ` `` at the line endings in above code block indicates multi-line command for Windows.
-+ Replace it with `\` for Unix and `^` for Windows PowerShell.
++ The `` ` `` at the line endings in above code block indicates multi-line command for Windows PowerShell.
++ Replace it with `\` for Unix and `^` for Windows commandline.
 
 ### Check Stack Status
 
@@ -34,14 +34,14 @@ Expected output: `"CREATE_COMPLETE"`
 ```
 aws lambda invoke --function-name apigeeDemo-putUser `
 --cli-binary-format raw-in-base64-out `
---payload '{\"name\":\"awscli\",\"xCorrelationId\":\"test-corr-id1\",\"attr1\":\"val1\",\"attr2\":\"val2\"}' `
+--payload '{\"metadata\":{\"xCorrelationId\":\"test-corr-id1\"},\"data\":{\"username\":\"awscli\",\"attr1\":\"val1\",\"attr2\":\"val2\"}}' `
 putUserOutput.log
 ```
 
 ```
 aws lambda invoke --function-name apigeeDemo-getUser `
 --cli-binary-format raw-in-base64-out `
---payload '{\"name\":\"awscli\",\"xCorrelationId\":\"test-corr-id2\"}' `
+--payload '{\"metadata\":{\"xCorrelationId\":\"test-corr-id2\"},\"data\":{\"username\":\"awscli\"}}' `
 getUserOutput.log
 ```
 

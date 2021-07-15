@@ -1,0 +1,33 @@
+<APIProxy revision="1" name="lambda-proxy">
+	<DisplayName>lambda-proxy</DisplayName>
+	<Description>Proxy to demonstrate calling AWS Lambda from JavaScript policy using "aws-sdk-light-apigee-bundle"</Description>
+	<Policies>
+		<Policy>am-resp-400-bad-request.xml</Policy>
+		<Policy>am-resp-500-server-error.xml</Policy>
+		<Policy>am-resp-add-headers.xml</Policy>
+		<Policy>ev-req-getuser.xml</Policy>
+		<Policy>ev-req-putuser.xml</Policy>
+		<Policy>js-call-lambda.xml</Policy>
+		<Policy>js-call-sts.xml</Policy>
+		<Policy>js-validate-session.xml</Policy>
+		<Policy>kvm-getuser_lambda_creds-delete.xml</Policy>
+		<Policy>kvm-getuser_lambda_creds-get.xml</Policy>
+		<Policy>kvm-getuser_lambda_creds-put.xml</Policy>
+		<Policy>kvm-putuser_lambda_creds-delete.xml</Policy>
+		<Policy>kvm-putuser_lambda_creds-get.xml</Policy>
+		<Policy>kvm-putuser_lambda_creds-put.xml</Policy>
+		<Policy>kvm-sts_creds-get.xml</Policy>
+		<Policy>rf-405-method-not-allowed.xml</Policy>
+	</Policies>
+	<ProxyEndpoints>
+		<ProxyEndpoint>v0-users</ProxyEndpoint>
+	</ProxyEndpoints>
+	<Resources>
+		<Resource>jsc://aws-sdk-light-apigee.bundle.js</Resource>
+		<Resource>jsc://call-sts.js</Resource>
+		<Resource>jsc://call-lambda.js</Resource>
+		<Resource>jsc://validate-session.js</Resource>
+	</Resources>
+	<Basepaths>/v0</Basepaths>
+	<ConfigurationVersion majorVersion="4" minorVersion="0"/>
+</APIProxy>

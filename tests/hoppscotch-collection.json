@@ -1,0 +1,320 @@
+[
+  {
+    "name": "Apigee JS Policy Lambda Call Demo",
+    "folders": [],
+    "requests": [
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "CONNECT",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"405 Method Not Allowed: CONNECT\", () => {\r\n  pw.expect(pw.response.status).toBe(405);\r\n});",
+        "name": "405 Method Not Allowed: CONNECT"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "POST",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"405 Method Not Allowed: POST\", () => {\r\n  pw.expect(pw.response.status).toBe(405);\r\n});",
+        "name": "405 Method Not Allowed: POST"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "HEAD",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"405 Method Not Allowed: HEAD\", () => {\r\n  pw.expect(pw.response.status).toBe(405);\r\n});",
+        "name": "405 Method Not Allowed: HEAD"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "DELETE",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"405 Method Not Allowed: DELETE\", () => {\r\n  pw.expect(pw.response.status).toBe(405);\r\n});",
+        "name": "405 Method Not Allowed: DELETE"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "GET",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "",
+        "testScript": "pw.test(\"400 Bad Request: GET missing X-Correlation-Id\", () => {\r\n  pw.expect(pw.response.status).toBe(400);\r\n});",
+        "name": "400 Bad Request: GET missing X-Correlation-Id"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "PUT",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "",
+        "testScript": "pw.test(\"400 Bad Request: PUT missing X-Correlation-Id\", () => {\r\n  pw.expect(pw.response.status).toBe(400);\r\n});",
+        "name": "400 Bad Request: PUT missing X-Correlation-Id"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "GET",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"400 Bad Request: GET missing path parameter\", () => {\r\n  pw.expect(pw.response.status).toBe(400);\r\n  pw.expect(pw.response.headers.X-Correlation-Id).toBe(<<xCorrelationId>>);\r\n});",
+        "name": "400 Bad Request: GET missing path parameter"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "PUT",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [
+          {
+            "key": "name",
+            "value": "<<username>>",
+            "active": true
+          }
+        ],
+        "rawParams": "{\n  \"name\": \"<<username>>\"\n}",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"400 Bad Request: PUT missing JSON pathload parameter\", () => {\r\n  pw.expect(pw.response.status).toBe(400);\r\n  pw.expect(pw.response.headers.X-Correlation-Id).toBe(<<xCorrelationId>>);\r\n});",
+        "name": "400 Bad Request: PUT missing JSON payload parameter"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "PUT",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [
+          {
+            "key": "username",
+            "value": "<<username>>",
+            "active": true
+          },
+          {
+            "key": "attr1",
+            "value": "value1",
+            "active": true
+          },
+          {
+            "key": "attr2",
+            "value": "value2",
+            "active": true
+          }
+        ],
+        "rawParams": "{\n  \"username\": \"<<username>>\",\n  \"attr1\": \"value1\",\n  \"attr2\": \"value2\"\n}",
+        "rawInput": true,
+        "contentType": "application/xml",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"400 Bad Request: PUT invalid Content-Type\", () => {\r\n  pw.expect(pw.response.status).toBe(400);\r\n  pw.expect(pw.response.headers.X-Correlation-Id).toBe(<<xCorrelationId>>);\r\n});",
+        "name": "400 Bad Request: PUT invalid content-type"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>",
+        "method": "PUT",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [
+          {
+            "key": "username",
+            "value": "<<username>>",
+            "active": true
+          },
+          {
+            "key": "attr1",
+            "value": "value1",
+            "active": true
+          },
+          {
+            "key": "attr2",
+            "value": "value2",
+            "active": true
+          }
+        ],
+        "rawParams": "{\n  \"username\": \"<<username>>\",\n  \"attr1\": \"value1\",\n  \"attr2\": \"value2\"\n}",
+        "rawInput": true,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"200 OK: PUT user\", () => {\r\n  pw.expect(pw.response.status).toBe(200);\r\n  pw.expect(pw.response.headers.X-Correlation-Id).toBe(<<xCorrelationId>>);\r\n  pw.expect(pw.response.headers.X-XSS-Protection).toBe(\"1; mode=block\");\r\n});",
+        "name": "200 OK: PUT user"
+      },
+      {
+        "url": "http://<<org>>-<<env>>.apigee.net",
+        "path": "<<basepath>>/<<username>>",
+        "method": "GET",
+        "auth": "None",
+        "httpUser": "",
+        "httpPassword": "",
+        "passwordFieldType": "",
+        "bearerToken": "",
+        "headers": [
+          {
+            "key": "X-Correlation-Id",
+            "value": "<<xCorrelationId>>",
+            "active": true
+          }
+        ],
+        "params": [],
+        "bodyParams": [],
+        "rawParams": "",
+        "rawInput": false,
+        "contentType": "application/json",
+        "requestType": "curl",
+        "preRequestScript": "pw.env.set(\"xCorrelationId\", Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));",
+        "testScript": "pw.test(\"200 OK: GET user\", () => {\r\n  pw.expect(pw.response.status).toBe(200);\r\n  pw.expect(pw.response.headers.X-Correlation-Id).toBe(<<xCorrelationId>>);\r\n  pw.expect(pw.response.headers.X-XSS-Protection).toBe(\"1; mode=block\");\r\n});",
+        "name": "200 OK: GET user"
+      }
+    ]
+  }
+]

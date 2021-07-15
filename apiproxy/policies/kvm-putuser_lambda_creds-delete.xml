@@ -1,0 +1,9 @@
+<KeyValueMapOperations name="kvm-putuser_lambda_creds-delete" mapIdentifier="putuser_lambda_creds">
+	<DisplayName>Delete putUser credentials from KVM</DisplayName>
+	<Scope>apiproxy</Scope>
+	<Delete>
+		<Key>
+			<Parameter>expiration</Parameter>
+		</Key>
+	</Delete>
+</KeyValueMapOperations>

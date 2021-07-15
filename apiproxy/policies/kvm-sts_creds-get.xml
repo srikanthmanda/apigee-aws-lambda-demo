@@ -1,0 +1,29 @@
+<KeyValueMapOperations name="kvm-sts_creds-get" mapIdentifier="sts_creds">
+	<DisplayName>Get STS credentials from KVM</DisplayName>
+	<Scope>environment</Scope>
+	<Get assignTo="private.accessKeyId" index="1">
+		<Key>
+			<Parameter>accessKeyId</Parameter>
+		</Key>
+	</Get>
+	<Get assignTo="private.secretAccessKey" index="1">
+		<Key>
+			<Parameter>secretAccessKey</Parameter>
+		</Key>
+	</Get>
+	<Get assignTo="private.region" index="1">
+		<Key>
+			<Parameter>region</Parameter>
+		</Key>
+	</Get>
+	<Get assignTo="private.lambdaRoleArn" index="1">
+		<Key>
+			<Parameter ref="kvmkey.lambdaRoleArn"/>
+		</Key>
+	</Get>
+	<Get assignTo="private.lambdaName" index="1">
+		<Key>
+			<Parameter ref="kvmkey.lambdaName"/>
+		</Key>
+	</Get>
+</KeyValueMapOperations>

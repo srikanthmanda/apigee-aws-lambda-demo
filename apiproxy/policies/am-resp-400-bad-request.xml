@@ -1,0 +1,14 @@
+<AssignMessage name="am-resp-400-bad-request">
+	<DisplayName>Return 400 bad-request response</DisplayName>
+	<AssignTo createNew="false" type="request"/>
+	<Copy source="request">
+		<Headers>
+			<Header name="X-Correlation-Id"/>
+		</Headers>
+	</Copy>
+	<Set>
+		<StatusCode>400</StatusCode>
+		<ReasonCode>Client Error</ReasonCode>
+		<Payload contentType="text/plain">400 Bad Request</Payload>
+	</Set>
+</AssignMessage>

@@ -1,0 +1,14 @@
+<AssignMessage name="am-resp-500-server-error">
+	<DisplayName>Return 500 internal-server-error response</DisplayName>
+	<AssignTo createNew="false" type="request"/>
+	<Copy source="request">
+		<Headers>
+			<Header name="X-Correlation-Id"/>
+		</Headers>
+	</Copy>
+	<Set>
+		<StatusCode>500</StatusCode>
+		<ReasonCode>Server Error</ReasonCode>
+		<Payload contentType="text/plain">500 Internal Server Error</Payload>
+	</Set>
+</AssignMessage>

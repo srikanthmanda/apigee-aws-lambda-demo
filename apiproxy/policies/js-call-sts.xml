@@ -1,0 +1,5 @@
+<Javascript name="js-call-sts" timeLimit="1000">
+	<DisplayName>Call STS for session credentials</DisplayName>
+	<IncludeURL>jsc://aws-sdk-light-apigee.bundle.js</IncludeURL>
+	<ResourceURL>jsc://call-sts.js</ResourceURL>
+</Javascript>

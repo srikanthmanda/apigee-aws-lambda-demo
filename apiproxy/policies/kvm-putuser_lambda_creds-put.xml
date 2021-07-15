@@ -1,0 +1,34 @@
+<KeyValueMapOperations name="kvm-putuser_lambda_creds-put" mapIdentifier="putuser_lambda_creds">
+	<DisplayName>Put putUser credentials in KVM</DisplayName>
+	<Scope>apiproxy</Scope>
+	<Put override="true">
+		<Key>
+			<Parameter>accessKeyId</Parameter>
+		</Key>
+		<Value ref="private.accessKeyId"/>
+	</Put>
+	<Put override="true">
+		<Key>
+			<Parameter>secretAccessKey</Parameter>
+		</Key>
+		<Value ref="private.secretAccessKey"/>
+	</Put>
+	<Put override="true">
+		<Key>
+			<Parameter>sessionToken</Parameter>
+		</Key>
+		<Value ref="private.sessionToken"/>
+	</Put>
+	<Put override="true">
+		<Key>
+			<Parameter>expiration</Parameter>
+		</Key>
+		<Value ref="private.expiration"/>
+	</Put>
+	<Put override="true">
+		<Key>
+			<Parameter>lambdaName</Parameter>
+		</Key>
+		<Value ref="private.lambdaName"/>
+	</Put>
+</KeyValueMapOperations>

@@ -1,0 +1,14 @@
+<AssignMessage name="am-resp-add-headers">
+	<DisplayName>Add headers to response</DisplayName>
+	<AssignTo createNew="false" type="response"/>
+	<Copy source="request">
+		<Header name="X-Correlation-Id"/>
+		<Header name="Content-Type"/>
+	</Copy>
+	<Add>
+		<Headers>
+			<Header name="X-XSS-Protection">1; mode=block</Header>
+		</Headers>
+	</Add>
+	<IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

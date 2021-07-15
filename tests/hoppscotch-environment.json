@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Test",
+    "variables": [
+      {
+        "key": "org",
+        "value": "username-randomstring-eval"
+      },
+      {
+        "key": "env",
+        "value": "test"
+      },
+      {
+        "key": "basepath",
+        "value": "/v0/users"
+      },
+      {
+        "key": "username",
+        "value": "wonwon"
+      }
+    ]
+  }
+]

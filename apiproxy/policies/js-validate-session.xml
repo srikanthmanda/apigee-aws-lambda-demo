@@ -1,0 +1,4 @@
+<Javascript name="js-validate-session" timeLimit="200">
+	<DisplayName>Validate session credentials</DisplayName>
+	<ResourceURL>jsc://validate-session.js</ResourceURL>
+</Javascript>

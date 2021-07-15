@@ -1,0 +1,16 @@
+<RaiseFault name="rf-400-bad-request">
+	<DisplayName>Raise 400 bad-request error</DisplayName>
+	<FaultResponse>
+		<Copy source="request">
+			<Headers>
+				<Header name="X-Correlation-Id"/>
+			</Headers>
+		</Copy>
+		<Set>
+			<StatusCode>400</StatusCode>
+			<ReasonPhrase>Client Error</ReasonPhrase>
+			<Payload contentType="text/plain">400 Bad Request</Payload>
+		</Set>
+	</FaultResponse>
+	<IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</RaiseFault>

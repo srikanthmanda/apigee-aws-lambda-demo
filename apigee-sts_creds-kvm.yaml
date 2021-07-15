@@ -1,0 +1,8 @@
+sts_creds:
+  region: <AWS_region>
+  accessKeyId: <AccessKeyId>
+  secretAccessKey: <SecretAccessKey>
+  getUserLambda: apigeeDemo-getUser
+  putUserLambda: apigeeDemo-putUser
+  getUserExecRoleArn: arn:aws:iam::<AWS_Account_No>:role/apigeeDemo-execGetUserRole
+  putUserExecRoleArn: arn:aws:iam::<AWS_Account_No>:role/apigeeDemo-execPutUserRole

@@ -1,0 +1,12 @@
+<ExtractVariables name="ev-req-getuser">
+	<DisplayName>Extract data from GET request</DisplayName>
+	<Source clearPayload="true">request</Source>
+	<Header name="X-Correlation-Id">
+		<Pattern>{xCorrelationId}</Pattern>
+	</Header>
+	<URIPath>
+		<Pattern>/{username}</Pattern>
+	</URIPath>
+	<VariablePrefix>ev</VariablePrefix>
+	<IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</ExtractVariables>

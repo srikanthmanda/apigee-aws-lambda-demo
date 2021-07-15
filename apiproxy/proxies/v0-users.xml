@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProxyEndpoint name="v0-users">
+	<HTTPProxyConnection>
+		<BasePath>/v0/users</BasePath>
+		<VirtualHost>default</VirtualHost>
+	</HTTPProxyConnection>
+	<PreFlow>
+		<Request>
+			<Step>
+				<Condition>!(request.verb = "GET" or request.verb = "PUT")</Condition>
+				<Name>rf-405-method-not-allowed</Name>
+			</Step>
+			<Step>
+				<!-- RF needed here as EV IgnoreUnresolvedVariables = false isn't working for unresolved headers -->
+				<Condition>(request.header.X-Correlation-Id is null)</Condition>
+				<Name>rf-400-bad-request</Name>
+			</Step>
+		</Request>
+	</PreFlow>
+	<Flows>
+		<Flow name="getuser">
+			<Condition>(request.verb = "GET")</Condition>
+			<Request>
+				<Step>
+					<Name>ev-req-getuser</Name>
+				</Step>
+				<Step>
+					<!-- EV IgnoreUnresolvedVariables = false isn't working for unresolved path params too -->
+					<Condition>(ev.username is null)</Condition>
+					<Name>rf-400-bad-request</Name>
+				</Step>
+				<Step>
+					<Name>kvm-getuser_lambda_creds-get</Name>
+				</Step>
+				<Step>
+					<Name>js-validate-session</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>kvm-sts_creds-get</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>js-call-sts</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>kvm-getuser_lambda_creds-put</Name>
+				</Step>
+			</Request>
+		</Flow>
+		<Flow name="putuser">
+			<Condition>(request.verb = "PUT")</Condition>
+			<Request>
+				<Step>
+					<!-- EV from JSONPayload doesn't error if content-type isn't application/json -->
+					<Condition>(request.header.Content-Type != "application/json; charset=utf-8") and (request.header.Content-Type != "application/json")</Condition>
+					<Name>rf-400-bad-request</Name>
+				</Step>
+				<Step>
+					<Name>ev-req-putuser</Name>
+				</Step>
+				<Step>
+					<Name>kvm-putuser_lambda_creds-get</Name>
+				</Step>
+				<Step>
+					<Name>js-validate-session</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>kvm-sts_creds-get</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>js-call-sts</Name>
+				</Step>
+				<Step>
+					<Condition>(sessionState != "valid")</Condition>
+					<Name>kvm-putuser_lambda_creds-put</Name>
+				</Step>
+			</Request>
+		</Flow>
+	</Flows>
+	<PostFlow>
+		<Response>
+			<Step>
+				<Name>am-resp-add-headers</Name>
+			</Step>
+			<Step>
+				<Name>js-call-lambda</Name>
+			</Step>
+		</Response>
+	</PostFlow>
+	<DefaultFaultRule name="Unknown Error">
+		<Step>
+			<Name>am-resp-500-server-error</Name>
+		</Step>
+	</DefaultFaultRule>
+	<FaultRules>
+		<FaultRule name="JS Errors">
+			<Condition>fault.name Matches "ScriptExecutionFailed"</Condition>
+			<Step>
+				<Condition>(requestFlow = "getuser")</Condition>
+				<Name>kvm-getuser_lambda_creds-delete</Name>
+			</Step>
+			<Step>
+				<Condition>(requestFlow = "putuser")</Condition>
+				<Name>kvm-putuser_lambda_creds-delete</Name>
+			</Step>
+			<Step>
+				<Name>am-resp-500-server-error</Name>
+			</Step>
+		</FaultRule>
+		<!-- Following fault rules not working -->
+		<!-- <FaultRule name="Lambda Error">
+			<Condition>(javascript.js-call-lambda.failed = true)</Condition>
+			<Step>
+				<Name>am-resp-500-server-error</Name>
+			</Step>
+		</FaultRule>
+		<FaultRule name="STS Error">
+			<Condition>(javascript.js-call-sts.failed = true)</Condition>
+			<Step>
+				<Condition>(requestFlow = "getuser")</Condition>
+				<Name>kvm-getuser_lambda_creds-delete</Name>
+			</Step>
+			<Step>
+				<Condition>(requestFlow = "putuser")</Condition>
+				<Name>kvm-putuser_lambda_creds-delete</Name>
+			</Step>
+			<Step>
+				<Name>am-resp-500-server-error</Name>
+			</Step>
+		</FaultRule> -->
+		<FaultRule name="Extract Variable Error">
+			<!-- EV does error for unresolved variables in JSONPayload if content-type = application/json -->
+			<Condition>(extractvariables.ev-req-putuser.failed = true)</Condition>
+			<Step>
+				<Name>am-resp-400-bad-request</Name>
+			</Step>
+		</FaultRule>
+		<FaultRule name="Raised Faults">
+			<Condition>(fault.name = "RaiseFault")</Condition>
+			<!-- This FR without Step is needed to stop Default FR from running -->
+		</FaultRule>
+	</FaultRules>
+	<RouteRule name="noroute"/>
+</ProxyEndpoint>
